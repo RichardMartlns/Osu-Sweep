@@ -1,0 +1,32 @@
+﻿<Window x:Class="OsuSweep.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Osu! Sweep" Height="450" Width="800">
+
+    <Grid>
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock FontSize="20" Margin="0,0,0,20">
+                Bem-vindo ao Osu! Sweep!
+            </TextBlock>
+
+            <TextBlock>
+                Por favor, selecione a sua pasta "Songs" do osu!:
+            </TextBlock>
+
+            <Button Margin="0,10,0,10" Padding="10,5"
+                    Content="Selecionar Pasta..."
+                    Command="{Binding SelectFolderCommand}"/>
+
+            <TextBlock FontWeight="Bold"
+                       Text="{Binding SelectedFolderPath, FallbackValue='Pasta selecionada: (Nenhuma)', StringFormat='Pasta selecionada: {0}'}"/>
+
+            <Button Content="Analisar Beatmaps"
+                    Command="{Binding ScanCommand}"
+                    Margin="0,20,0,0"
+                    Padding="10,5"/>
+
+            <TextBlock Text="{Binding StatusMessage}" Margin="0,10,0,0"/>
+
+        </StackPanel>
+    </Grid>
+</Window>
