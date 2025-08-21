@@ -1,0 +1,17 @@
+# Arquivos específicos do Visual Studio e do sistema operacional
+.vs/
+*.user
+*.suo
+
+# Pastas de compilação
+[Bb]in/
+[Oo]bj/
+
+# Arquivos de build e pacotes
+**/packages/*
+**/[Pp]ackages/*
+*.nupkg
+
+# Outros
+*~
+*.log
