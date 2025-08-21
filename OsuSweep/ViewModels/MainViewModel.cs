@@ -11,13 +11,14 @@ namespace OsuSweep.ViewModels
     {
 
         private readonly BeatmapService _beatmapService;
+        private readonly IFolderDialogService _folderDialogService;
         private string _selectedFolderPath = string.Empty;
         private bool _isScanning;
         private string _statusMessage = "Pronto para começar!";
-        private readonly IFolderDialogService _folderDialogService;
+
 
         public ObservableCollection<BeatmapSet> FoundBeatmaps { get; } = new ObservableCollection<BeatmapSet>();
-        public ICommand SelectFolderCommand { get; }
+
 
         public string SelectedFolderPath
         {
@@ -38,6 +39,7 @@ namespace OsuSweep.ViewModels
         }
 
         public ICommand ScanCommand { get; }
+        public ICommand SelectFolderCommand { get; }
 
         public MainViewModel(IFolderDialogService folderDialogService)
         {
@@ -73,6 +75,8 @@ namespace OsuSweep.ViewModels
                 }
 
                 StatusMessage = $"Análise concluída! {FoundBeatmaps.Count} pastas de beatmaps encontradas.";
+
+                await FetchAllBeatmapMetadataAsync();
             }
             catch (Exception ex)
             {
@@ -83,6 +87,35 @@ namespace OsuSweep.ViewModels
                 IsScanning = false;
             }
         }
+
+        private async Task FetchAllBeatmapMetadataAsync()
+        {
+            // Filter the list to get only the beatmaps that have a valid ID.
+            var beatmapsToFetch = FoundBeatmaps.Where(b => b.BeatmapSetId.HasValue).ToList();
+            if (!beatmapsToFetch.Any()) return;
+
+            int count = 0;
+            foreach (var beatmap in beatmapsToFetch)
+            {
+                count++;
+                StatusMessage = $"Buscando metadados... ({count}/{beatmapsToFetch.Count})";
+
+                // Call the service to fetch the current beatmap data.
+                var metadata = await _beatmapService.GetBeatmapMetadataAsync(beatmap.BeatmapSetId!.Value);
+
+                if (metadata != null)
+                {
+                    beatmap.Title = metadata.Title;
+                    beatmap.Artist = metadata.Artist;
+                    beatmap.GameModes = metadata.GameModes;
+                    beatmap.IsMetadataLoaded = true;
+                }
+
+                StatusMessage = "Busca de metadados concluída!";
+
+            }
+        }
+
         private void SelectFolder()
         {
             var selectedPath = _folderDialogService.ShowDialog();

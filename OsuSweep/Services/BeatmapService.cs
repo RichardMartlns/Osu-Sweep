@@ -1,10 +1,17 @@
 ﻿using OsuSweep.Models;
 using System.IO;
+using System.Net.Http;
+using System.Text.Json;
+
+
 
 namespace OsuSweep.Services
 {
     public class BeatmapService
     {
+        private static readonly HttpClient _httpClient = new HttpClient();
+
+        private const string ApiBaseUrl = "";
 
         public async Task<List<BeatmapSet>> ScanSongsFolderAsync(string songsFolderPath)
         {
@@ -26,6 +33,38 @@ namespace OsuSweep.Services
 
                 return beatmapSets;
             });
+        }
+
+        /// <summary>
+        /// Fetch the metadata of a single beatmap set from our backend API.
+        /// </summary>
+        /// <param name="beatmapId">The ID of the beatmap set to be queried.</param>
+        /// <returns>The beatmap data from the API, or null if the request fails.</returns>
+        public async Task<ApiBeatmapData?> GetBeatmapMetadataAsync(int beatmapId)
+        {
+            var requestUrl = $"{ApiBaseUrl}?id={beatmapId}";
+
+            try
+            {
+
+                HttpResponseMessage response = await _httpClient.GetAsync(requestUrl);
+
+                response.EnsureSuccessStatusCode();
+
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+
+                return JsonSerializer.Deserialize<ApiBeatmapData>(jsonResponse);
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Erro na requisição HTTP: {e.Message}");
+                return null;
+            }
+            catch (JsonException e)
+            {
+                Console.WriteLine($"Erro na desserialização do JSON {e.Message}");
+                return null;
+            }
         }
 
         private int? TryExtractIdFromName(string folderName)
