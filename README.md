@@ -1,10 +1,5 @@
-<div align="center">
-
-<a href="./README.pt.md">
-<img src="https://raw.githubusercontent.com/Tj-Jaguar/Tj-Jaguar/main/assets/br.svg" width="35" title="View in Portuguese">
-</a>
-
-</div>
+[<img src="./assets/br.svg" width="35" title="View in Portuguese">](./README.pt.md)
+[<img src="./assets/es.svg" width="35" title="View in Spanish">](./README.es.md)
 
 # osu! Sweep
 
