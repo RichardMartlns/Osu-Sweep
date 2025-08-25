@@ -7,6 +7,9 @@ using System.Text.Json;
 
 namespace OsuSweep.Services
 {
+    /// <summary>
+    /// Provides services related to the beatmap business logic, such as scanning folders and fetching data from APIs.
+    /// </summary>
     public class BeatmapService
     {
         private static readonly HttpClient _httpClient = new HttpClient();
@@ -53,6 +56,7 @@ namespace OsuSweep.Services
 
                 string jsonResponse = await response.Content.ReadAsStringAsync();
 
+                // We use System.Text.Json to convert the API response (JSON) into a C# object.
                 return JsonSerializer.Deserialize<ApiBeatmapData>(jsonResponse);
             }
             catch (HttpRequestException e)
@@ -67,6 +71,12 @@ namespace OsuSweep.Services
             }
         }
 
+        /// <summary>
+        /// Attempts to extract a numeric ID from the beginning of a string (folder name).
+        /// The common format is '12345 Artist - Title'.
+        /// </summary>
+        /// <param name="folderName">The beatmap folder name.</param>
+        /// <returns>The ID as an integer, or null if not found.</returns>
         private int? TryExtractIdFromName(string folderName)
         {
             string? potentialId = folderName.Split(' ').FirstOrDefault();

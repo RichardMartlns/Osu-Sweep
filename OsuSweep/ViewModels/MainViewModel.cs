@@ -53,10 +53,14 @@ namespace OsuSweep.ViewModels
 
             SelectFolderCommand = new RelayCommand(
                 (parameter) => SelectFolder(),
+                // The 'Select Folder' button can only be clicked if no analysis is in progress.
                 (parameter) => !IsScanning
              );
         }
 
+        /// <summary>
+        /// Orchestrates the entire analysis process, starting with folder scanning and then fetching the metadata.
+        /// </summary>
         private async Task StartScanAsync(string songsFolderPath)
         {
             if (string.IsNullOrEmpty(songsFolderPath)) return;
@@ -115,7 +119,9 @@ namespace OsuSweep.ViewModels
 
             }
         }
-
+        /// <summary>
+        /// Use the dialog service to let the user select the 'Songs' folder.
+        /// </summary>
         private void SelectFolder()
         {
             var selectedPath = _folderDialogService.ShowDialog();
