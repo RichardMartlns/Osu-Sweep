@@ -2,7 +2,7 @@
   "profiles": {
     "OsuSweep.Backend": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7117",
+      "commandLineArgs": "--port 7032",
       "launchBrowser": false
     }
   }

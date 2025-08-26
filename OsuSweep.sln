@@ -5,7 +5,7 @@ VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuSweep", "OsuSweep\OsuSweep.csproj", "{0332C94C-9868-4B41-9294-9DB7D47D7600}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuSweep.Backend", "OsuSweep\OsuSweep.Backend\OsuSweep.Backend.csproj", "{E400B579-A035-4FBE-B065-69FF95C4A86E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuSweep.Backend", "OsuSweep.Backend\OsuSweep.Backend.csproj", "{EA9130F9-0082-4218-AE0E-6801825BC227}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{0332C94C-9868-4B41-9294-9DB7D47D7600}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0332C94C-9868-4B41-9294-9DB7D47D7600}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0332C94C-9868-4B41-9294-9DB7D47D7600}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E400B579-A035-4FBE-B065-69FF95C4A86E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E400B579-A035-4FBE-B065-69FF95C4A86E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E400B579-A035-4FBE-B065-69FF95C4A86E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E400B579-A035-4FBE-B065-69FF95C4A86E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA9130F9-0082-4218-AE0E-6801825BC227}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA9130F9-0082-4218-AE0E-6801825BC227}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA9130F9-0082-4218-AE0E-6801825BC227}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA9130F9-0082-4218-AE0E-6801825BC227}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

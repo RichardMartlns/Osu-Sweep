@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 
 
@@ -14,7 +15,7 @@ namespace OsuSweep.Services
     {
         private static readonly HttpClient _httpClient = new HttpClient();
 
-        private const string ApiBaseUrl = "";
+        private const string ApiBaseUrl = "http://localhost:7032/api/GetBeatmapData";
 
         public async Task<List<BeatmapSet>> ScanSongsFolderAsync(string songsFolderPath)
         {
@@ -72,25 +73,28 @@ namespace OsuSweep.Services
         }
 
         /// <summary>
-        /// Attempts to extract a numeric ID from the beginning of a string (folder name).
-        /// The common format is '12345 Artist - Title'.
+        /// Attempts to extract a numeric ID from the beginning of a string (folder name) using Regex.
         /// </summary>
-        /// <param name="folderName">The beatmap folder name.</param>
-        /// <returns>The ID as an integer, or null if not found.</returns>
+        /// <param name="folderName">The name of the folder to parse.</param>
+        /// <returns>The extracted ID as an integer, or null if no leading digits are found.</returns>
+        /// <remarks>
+        /// This method uses the regular expression pattern "^(\d+)" to find one or more digits
+        /// at the absolute start of the string. It is robust against different separators
+        /// (or no separator at all) following the ID.
+        /// </remarks>
         private int? TryExtractIdFromName(string folderName)
         {
-            string? potentialId = folderName.Split(' ').FirstOrDefault();
+            var match = Regex.Match(folderName, @"^(\d+)");
 
-            if (potentialId != null)
+            if (match.Success)
             {
-                return null;
-            }
+                string potentialId = match.Groups[1].Value;
 
-            if (int.TryParse(potentialId, out int id))
-            {
-                return id;
+                if (int.TryParse(potentialId, out int id))
+                {
+                    return id;
+                }
             }
-
             return null;
         }
     }
