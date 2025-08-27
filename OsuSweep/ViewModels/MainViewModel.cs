@@ -10,7 +10,7 @@ namespace OsuSweep.ViewModels
     public class MainViewModel : ViewModelBase
     {
 
-        private readonly BeatmapService _beatmapService;
+        private readonly IBeatmapService _beatmapService;
         private readonly IFolderDialogService _folderDialogService;
         private string _selectedFolderPath = string.Empty;
         private bool _isScanning;
@@ -41,19 +41,20 @@ namespace OsuSweep.ViewModels
         public ICommand ScanCommand { get; }
         public ICommand SelectFolderCommand { get; }
 
-        public MainViewModel(IFolderDialogService folderDialogService)
+        public MainViewModel(IFolderDialogService folderDialogService, IBeatmapService beatmapService)
         {
-            _beatmapService = new BeatmapService();
+            _beatmapService = beatmapService;
             _folderDialogService = folderDialogService;
 
-            ScanCommand = new RelayCommand(
-                async (parameter) => await StartScanAsync(SelectedFolderPath),
-                (parameter) => !IsScanning && !string.IsNullOrEmpty(SelectedFolderPath)
+            ScanCommand = new AsyncRelayCommand(
+                () => StartScanAsync(SelectedFolderPath),
+                () => !string.IsNullOrEmpty(SelectedFolderPath)
             );
 
+            // The 'Select Folder' button can only be clicked if no analysis is in progress.
             SelectFolderCommand = new RelayCommand(
                 (parameter) => SelectFolder(),
-                // The 'Select Folder' button can only be clicked if no analysis is in progress.
+
                 (parameter) => !IsScanning
              );
         }

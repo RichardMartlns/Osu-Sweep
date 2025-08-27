@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuSweep", "OsuSweep\OsuSwe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuSweep.Backend", "OsuSweep.Backend\OsuSweep.Backend.csproj", "{EA9130F9-0082-4218-AE0E-6801825BC227}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuSweep.Tests", "OsuSweep.Tests\OsuSweep.Tests.csproj", "{17C33FF5-B895-4811-B2EE-E8BB0E7C9020}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{EA9130F9-0082-4218-AE0E-6801825BC227}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA9130F9-0082-4218-AE0E-6801825BC227}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA9130F9-0082-4218-AE0E-6801825BC227}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17C33FF5-B895-4811-B2EE-E8BB0E7C9020}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17C33FF5-B895-4811-B2EE-E8BB0E7C9020}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17C33FF5-B895-4811-B2EE-E8BB0E7C9020}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17C33FF5-B895-4811-B2EE-E8BB0E7C9020}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -13,7 +13,7 @@ namespace OsuSweep.Views
         {
             InitializeComponent();
             
-            DataContext = new MainViewModel (new FolderDialogService ());
+            DataContext = new MainViewModel (new FolderDialogService(), new BeatmapService());
         }
     }
 }

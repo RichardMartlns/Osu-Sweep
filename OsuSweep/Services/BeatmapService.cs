@@ -11,7 +11,7 @@ namespace OsuSweep.Services
     /// <summary>
     /// Provides services related to the beatmap business logic, such as scanning folders and fetching data from APIs.
     /// </summary>
-    public class BeatmapService
+    public class BeatmapService : IBeatmapService
     {
         private static readonly HttpClient _httpClient = new HttpClient();
 
@@ -82,7 +82,7 @@ namespace OsuSweep.Services
         /// at the absolute start of the string. It is robust against different separators
         /// (or no separator at all) following the ID.
         /// </remarks>
-        private int? TryExtractIdFromName(string folderName)
+        public int? TryExtractIdFromName(string folderName)
         {
             var match = Regex.Match(folderName, @"^(\d+)");
 
