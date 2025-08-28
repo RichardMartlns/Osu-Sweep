@@ -27,6 +27,23 @@
 
             <TextBlock Text="{Binding StatusMessage}" Margin="0,10,0,0"/>
 
+            <GroupBox Header=" Selecione os modos de jogo para apagar" Margin="0,20,0,0" FontWeight="Bold" IsEnabled="{Binding IsReadyForSelection}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                    <CheckBox Content="Osu!"
+                              IsChecked="{Binding DeleteOsu, Mode=TwoWay}"
+                              Margin="5"/>
+                    <CheckBox Content="Taiko"
+                              IsChecked="{Binding DeleteTaiko, Mode=TwoWay}"
+                              Margin="5"/>
+                    <CheckBox Content="Catch"
+                              IsChecked="{Binding DeleteCatch, Mode=TwoWay}"
+                              Margin="5"/>
+                    <CheckBox Content="Mania"
+                              IsChecked="{Binding DeleteMania, Mode=TwoWay}"
+                              Margin="5"/>
+                </StackPanel>
+            </GroupBox>
+            <TextBlock Text="{Binding DeletionSummaryMessage}" Margin="0,10,0,0" FontSize="14" FontWeight="SemiBold"/>
         </StackPanel>
     </Grid>
 </Window>
