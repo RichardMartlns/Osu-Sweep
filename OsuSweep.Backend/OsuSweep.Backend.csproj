@@ -17,4 +17,8 @@
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\OsuSweep.Core\OsuSweep.Core.csproj" />
+  </ItemGroup>
+
 </Project>

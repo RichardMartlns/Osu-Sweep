@@ -1,5 +1,7 @@
-﻿
-namespace OsuSweep.Models
+﻿using OsuSweep.Core.Models;
+
+
+namespace OsuSweep.Core.Models
 {
 
     public class BeatmapSet
@@ -21,6 +23,8 @@ namespace OsuSweep.Models
             FolderPath = folderPath;
             BeatmapSetId = beatmapSetId;
         }
-    }
+
+        public List<BeatmapDifficulty> Difficulties { get; set; } = new List<BeatmapDifficulty>()
+;    }
 }
 

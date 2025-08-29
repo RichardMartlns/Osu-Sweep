@@ -1,4 +1,4 @@
-﻿using OsuSweep.Models;
+﻿using OsuSweep.Core.Models;
 using System.IO;
 
 namespace OsuSweep.Services
@@ -7,9 +7,11 @@ namespace OsuSweep.Services
     {
         Task<ApiBeatmapData?> GetBeatmapMetadataAsync(int beatmapId);
         Task<List<BeatmapSet>> ScanSongsFolderAsync(string songsFolderPath);
-        Task<long> CalculateTargetsSizeAsync(List<string> targets);
+
         int? TryExtractIdFromName(string folderName);
 
+        Task<long> CalculateTargetsSizeAsync(List<string> targets);
+        List<string> GetFilePathsForPartialDeletion(BeatmapSet beatmap, IEnumerable<string> modesToDelete);
         
     }
 }

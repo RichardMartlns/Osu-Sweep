@@ -1,30 +1,12 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using System.Web;
+using OsuSweep.Core.Models;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 
-// This is the model our WPF app expects to receive.
-namespace OsuSweep.Models
-{
-    public class ApiBeatmapData
-    {
-        [JsonPropertyName("beatmapSetId")]
-        public int BeatmapSetId { get; set; }
-
-        [JsonPropertyName("title")]
-        public string Title { get; set; } = string.Empty;
-
-        [JsonPropertyName("artist")]
-        public string Artist { get; set; } = string.Empty;
-
-        [JsonPropertyName("gameModes")]
-        public List<string> GameModes { get; set; } = new List<string>();
-    }
-}
 
 // This is the new model that matches the official osu! API response.
 namespace OsuSweep.Backend.Models
@@ -42,6 +24,9 @@ namespace OsuSweep.Backend.Models
 
         [JsonPropertyName("mode")]
         public string Mode { get; set; } = string.Empty;
+
+        [JsonPropertyName("version")]
+        public string Version { get; set; } = string.Empty;
     }
 }
 
@@ -65,13 +50,10 @@ namespace OsuSweep.Backend
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 
             // 1. READ THE API KEY AND THE BEATMAP ID
-            // We parse the query string manually for robustness.
-            var query = HttpUtility.ParseQueryString(req.Url.Query);
-            string? beatmapIdStr = query["id"];
-
-            // Read the API key from local settings (this file is not sent to Git).
+            // Read the API key from local settings
             string? apiKey = Environment.GetEnvironmentVariable("OsuApiKey");
-           
+            string? beatmapIdStr = System.Web.HttpUtility.ParseQueryString(req.Url.Query)["id"];
+
 
             if (string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(beatmapIdStr))
             {
@@ -86,7 +68,7 @@ namespace OsuSweep.Backend
             try
             {
                 var osuApiResponse = await _httpClient.GetStringAsync(osuApiUrl);
-                _logger.LogInformation($"Resposta recebida da API do osu!: {osuApiResponse}");
+
                 var osuBeatmaps = JsonSerializer.Deserialize<List<OsuSweep.Backend.Models.OsuApiBeatmap>>(osuApiResponse);
 
                 if (osuBeatmaps == null || osuBeatmaps.Count == 0)
@@ -97,19 +79,23 @@ namespace OsuSweep.Backend
 
                 // 3.PROCESS AND MAP THE RESPONSE
                 var firstMap = osuBeatmaps[0];
-                var responseData = new OsuSweep.Models.ApiBeatmapData
+                var responseData = new ApiBeatmapData
                 {
                     BeatmapSetId = int.Parse(firstMap.BeatmapSetId),
                     Title = firstMap.Title,
                     Artist = firstMap.Artist,
                     // We extract all unique game modes from the response.
-                    GameModes = osuBeatmaps.Select(b => b.Mode).Distinct().Select(mode => mode switch
+                    Difficulties = osuBeatmaps.Select(b => new BeatmapDifficulty
                     {
-                        "0" => "osu",
-                        "1" => "taiko",
-                        "2" => "catch",
-                        "3" => "mania",
-                        _ => "unknown"
+                        Version = b.Version,
+                        Mode = b.Mode switch
+                        {
+                            "0" => "osu",
+                            "1" => "taiko",
+                            "2" => "catch",
+                            "3" => "mania",
+                            _ => "unknown"
+                        }
                     }).ToList()
                 };
 

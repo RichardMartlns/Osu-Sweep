@@ -1,4 +1,4 @@
-﻿using OsuSweep.Models;
+﻿using OsuSweep.Core.Models;
 using OsuSweep.Services;
 using OsuSweep.ViewModels.Base;
 using OsuSweep.ViewModels.Commands;
@@ -181,8 +181,9 @@ namespace OsuSweep.ViewModels
                 {
                     beatmap.Title = metadata.Title;
                     beatmap.Artist = metadata.Artist;
-                    beatmap.GameModes = metadata.GameModes;
+                    beatmap.GameModes = metadata.Difficulties.Select(d => d.Mode).Distinct().ToList();
                     beatmap.IsMetadataLoaded = true;
+                    beatmap.Difficulties = metadata.Difficulties;
                 }
 
                 StatusMessage = "Busca de metadados concluída!";

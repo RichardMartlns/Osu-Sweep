@@ -1,8 +1,10 @@
-﻿using OsuSweep.Models;
+﻿using OsuSweep.Core.Models;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+
 
 
 
@@ -28,9 +30,9 @@ namespace OsuSweep.Services
                 foreach (var dir in directories)
                 {
 
-                    var foldername = new DirectoryInfo(dir).Name;
+                    var folderName = new DirectoryInfo(dir).Name;
 
-                    int? beatmapId = TryExtractIdFromName(foldername);
+                    int? beatmapId = TryExtractIdFromName(folderName);
 
                     beatmapSets.Add(new BeatmapSet(dir, beatmapId));
                 }
@@ -40,10 +42,14 @@ namespace OsuSweep.Services
         }
 
         /// <summary>
-        /// Fetch the metadata of a single beatmap set from our backend API.
+        /// Scans the specified "Songs" folder asynchronously, identifies beatmap folders,
+        /// and attempts to extract the ID from each folder name.
         /// </summary>
-        /// <param name="beatmapId">The ID of the beatmap set to be queried.</param>
-        /// <returns>The beatmap data from the API, or null if the request fails.</returns>
+        /// <param name="songsFolderPath">The absolute path to the osu! "Songs" folder.</param>
+        /// <returns>A Task that represents the asynchronous operation, containing a list of found BeatmapSet objects.</returns>
+        /// <remarks>
+        /// This is a potentially long-running I/O operation. It is executed on a background thread using Task.Run to prevent freezing the user interface.
+        /// </remarks>
         public async Task<ApiBeatmapData?> GetBeatmapMetadataAsync(int beatmapId)
         {
             var requestUrl = $"{ApiBaseUrl}?id={beatmapId}";
@@ -62,12 +68,12 @@ namespace OsuSweep.Services
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine($"Erro na requisição HTTP: {e.Message}");
+                Console.WriteLine($"HTTP request error: {e.Message}");
                 return null;
             }
             catch (JsonException e)
             {
-                Console.WriteLine($"Erro na desserialização do JSON {e.Message}");
+                Console.WriteLine($"Error deserializing JSON: {e.Message}");
                 return null;
             }
         }
@@ -139,6 +145,47 @@ namespace OsuSweep.Services
             {
                 return 0;
             }
+        }
+
+        /// <summary>
+        /// Identifies the specific .osu file paths within a single beatmap folder that correspond
+        /// to a list of game modes selected for partial deletion.
+        /// </summary>
+        /// <param name="beatmap">The BeatmapSet object to be analyzed. This object must have its 'Difficulties' property populated with data from the API.</param>
+        /// <param name="modesToDelete">An IEnumerable<string> containing the game modes the user wants to delete (e.g., ["taiko", "mania"]).</param>
+        /// <returns>A List<string> of absolute file paths for the .osu files that should be deleted. Returns an empty list if no matches are found.</returns>
+        /// <remarks>
+        /// This method works by cross-referencing the detailed 'Difficulties' list (from the API)
+        /// with the actual .osu files on disk, matching them by the '[Version]' name in the filename.
+        /// The file search is case-insensitive.
+        /// </remarks>
+        public List<string> GetFilePathsForPartialDeletion(BeatmapSet beatmap, IEnumerable<string> modesToDelete)
+        {
+            var filePathsToDelete = new List<string>();
+
+            var difficultiesToDelete = beatmap.Difficulties
+                 .Where(d => modesToDelete.Contains(d.Mode));
+
+            foreach (var difficulty in difficultiesToDelete)
+            {
+                try
+                {
+                    string fileEnding = $"[{difficulty.Version}].osu";
+
+                    string? foundFile = Directory.EnumerateFiles(beatmap.FolderPath, "*.osu")
+                                                 .FirstOrDefault(f => f.EndsWith(fileEnding, StringComparison.OrdinalIgnoreCase));
+
+                    if (foundFile != null)
+                    {
+                        filePathsToDelete.Add(foundFile);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Erro ao procurar arquivo para '{difficulty.Version}' na pasta '{beatmap.FolderPath}': {ex.Message}");
+                }
+            }
+            return filePathsToDelete;
         }
     }
 }

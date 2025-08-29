@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace OsuSweep.Models
+namespace OsuSweep.Core.Models
 {
     public class ApiBeatmapData
     {
@@ -13,7 +13,9 @@ namespace OsuSweep.Models
         [JsonPropertyName("artist")]
         public string Artist { get; set; } = string.Empty;
 
-        [JsonPropertyName("gameModes")]
-        public List<string> GameModes { get; set; } = new List<string>();
+        [JsonPropertyName("difficulties")]
+        public List<BeatmapDifficulty> Difficulties { get; set; } = new List<BeatmapDifficulty>();
+        
+        public int BeatmapSetId { get; set; }
     }
 }

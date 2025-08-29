@@ -1,5 +1,5 @@
 ﻿using Moq;
-using OsuSweep.Models;
+using OsuSweep.Core.Models;
 using OsuSweep.Services;
 using OsuSweep.ViewModels;
 
