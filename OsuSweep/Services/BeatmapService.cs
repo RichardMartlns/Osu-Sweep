@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Microsoft.VisualBasic.FileIO;
 
 
 
@@ -119,7 +120,15 @@ namespace OsuSweep.Services
                 long totalSize = 0;
                 foreach (var path in targets)
                 {
-                    totalSize += GetDirectorySize(path);
+                    if (Directory.Exists(path))
+                    {
+                        totalSize += GetDirectorySize(path);
+                    }
+                    else if (File.Exists(path))
+                    {
+                        totalSize += new FileInfo(path).Length;
+                    }
+                    
                 }
                 return totalSize;
             });
@@ -139,7 +148,7 @@ namespace OsuSweep.Services
             try
             {
                 var directory = new DirectoryInfo(folderPath);
-                return directory.GetFiles("*", SearchOption.AllDirectories).Sum(f => f.Length);
+                return directory.GetFiles("*", System.IO.SearchOption.AllDirectories).Sum(f => f.Length);
             }
             catch (DirectoryNotFoundException)
             {
@@ -164,7 +173,18 @@ namespace OsuSweep.Services
             var filePathsToDelete = new List<string>();
 
             var difficultiesToDelete = beatmap.Difficulties
-                 .Where(d => modesToDelete.Contains(d.Mode));
+                 .Where(d =>
+                 {
+                     bool isMatch = modesToDelete.Any(modesToCompare =>
+                     string.Equals(d.Mode.Trim(), modesToCompare.Trim(), StringComparison.OrdinalIgnoreCase)
+                     );
+
+                     Debug.WriteLine($"Comparison: the map’s mode '{d.Mode}'. Is this mode contained in the deletion list? → Result {isMatch}");
+
+                     return isMatch;
+                     
+                 });
+               
 
             foreach (var difficulty in difficultiesToDelete)
             {
@@ -182,10 +202,54 @@ namespace OsuSweep.Services
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Erro ao procurar arquivo para '{difficulty.Version}' na pasta '{beatmap.FolderPath}': {ex.Message}");
+                    Debug.WriteLine($"Error while searching for file '{difficulty.Version}' in folder '{beatmap.FolderPath}': {ex.Message}");
                 }
             }
             return filePathsToDelete;
+        }
+
+        public async Task deleteTargetAsync(List<string> targets, bool isPermanent)
+        {
+            await Task.Run(() =>
+            {
+                foreach (var path in targets)
+                {
+                    try
+                    {
+                        if (isPermanent)
+                        {
+                            if (File.Exists(path))
+                            {
+                                File.Delete(path);
+                            }
+                            else if (Directory.Exists(path))
+                            {
+                                Directory.Delete(path, true);
+                            }
+                        }
+                        else
+                        {
+                            if (File.Exists(path))
+                            {
+                                FileSystem.DeleteFile(path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                            }
+                            else if (Directory.Exists(path))
+                            {
+                                FileSystem.DeleteDirectory(path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Falha ao deletar '{path}': {ex.Message}");
+                    }
+                }
+            });
+        }
+
+        public Task DeleteTargetsAsync(List<string> targets, bool isPermanent)
+        {
+            throw new NotImplementedException();
         }
     }
 }

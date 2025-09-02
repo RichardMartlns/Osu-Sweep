@@ -3,29 +3,31 @@ using OsuSweep.Services;
 using OsuSweep.ViewModels.Base;
 using OsuSweep.ViewModels.Commands;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
+using System.IO;
+using System.Windows;
 using System.Windows.Input;
+
 
 namespace OsuSweep.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-
         private readonly IBeatmapService _beatmapService;
         private readonly IFolderDialogService _folderDialogService;
+
+        private List<string> _deletionTargets = new();
         private string _selectedFolderPath = string.Empty;
         private string _deletionSummaryMessage = string.Empty;
+        private string _statusMessage = "Pronto para começar!";
         private bool _isScanning;
         private bool _isReadyForSelection;
-        private string _statusMessage = "Pronto para começar!";
-
-        // Indicates whether the mode’s beatmaps should be selected for deletion.
         private bool _deleteOsu;
         private bool _deleteTaiko;
         private bool _deleteCatch;
         private bool _deleteMania;
+        private bool _isPermanentDelete;
 
-        public ObservableCollection<BeatmapSet> FoundBeatmaps { get; } = new ObservableCollection<BeatmapSet>();
+        public ObservableCollection<BeatmapSet> FoundBeatmaps { get; } = new();
 
 
         public string SelectedFolderPath
@@ -34,9 +36,7 @@ namespace OsuSweep.ViewModels
             set
             {
                 if (SetProperty(ref _selectedFolderPath, value))
-                {
-                    (ScanCommand as AsyncRelayCommand)?.OnCanExecuteChanged();
-                }
+                    RefreshCommands();
             }
         }
 
@@ -49,7 +49,11 @@ namespace OsuSweep.ViewModels
         public bool IsScanning
         {
             get => _isScanning;
-            set => SetProperty(ref _isScanning, value);
+            set
+            {
+                if (SetProperty(ref _isScanning, value))
+                    RefreshCommands();
+            }
         }
 
         public string StatusMessage
@@ -64,67 +68,48 @@ namespace OsuSweep.ViewModels
             set => SetProperty(ref _deletionSummaryMessage, value);
         }
 
-        public bool DeleteOsu
+        public bool IsPermanentDelete
         {
-            get => _deleteOsu;
-            set
-            {
-                if (SetProperty(ref _deleteOsu, value))
-                    _ = UpdateDeletionPreviewAsync();
-            }
-
+            get => _isPermanentDelete;
+            set => SetProperty(ref _isPermanentDelete, value);
         }
 
-        public bool DeleteTaiko
-        {
-            get => _deleteTaiko;
-            set
-            {
-                if (SetProperty(ref _deleteTaiko, value))
-                    _ = UpdateDeletionPreviewAsync();
-            }
-        }
-
-        public bool DeleteCatch
-        {
-            get => _deleteCatch;
-            set
-            {
-                if (SetProperty(ref _deleteCatch, value))
-                    _ = UpdateDeletionPreviewAsync();
-            }
-        }
-
-        public bool DeleteMania
-        {
-            get => _deleteMania;
-            set
-            {
-                if (SetProperty(ref _deleteMania, value))
-                    _ = UpdateDeletionPreviewAsync();
-            }
-        }
+        public bool DeleteOsu { get => _deleteOsu; set { if (SetProperty(ref _deleteOsu, value)) _ = UpdateDeletionPreviewAsync(); } }
+        public bool DeleteTaiko { get => _deleteTaiko; set { if (SetProperty(ref _deleteTaiko, value)) _ = UpdateDeletionPreviewAsync(); } }
+        public bool DeleteCatch { get => _deleteCatch; set { if (SetProperty(ref _deleteCatch, value)) _ = UpdateDeletionPreviewAsync(); } }
+        public bool DeleteMania { get => _deleteMania; set { if (SetProperty(ref _deleteMania, value)) _ = UpdateDeletionPreviewAsync(); } }
 
         public ICommand ScanCommand { get; }
         public ICommand SelectFolderCommand { get; }
+        public ICommand ConfirmDeletionCommand { get; }
 
         public MainViewModel(IFolderDialogService folderDialogService, IBeatmapService beatmapService)
         {
             _beatmapService = beatmapService;
             _folderDialogService = folderDialogService;
-            
+
 
             ScanCommand = new AsyncRelayCommand(
                 () => StartScanAsync(SelectedFolderPath),
-                () => !string.IsNullOrEmpty(SelectedFolderPath)
+                () => !string.IsNullOrEmpty(SelectedFolderPath) && !IsScanning
             );
 
             // The 'Select Folder' button can only be clicked if no analysis is in progress.
             SelectFolderCommand = new RelayCommand(
                 (parameter) => SelectFolder(),
-
                 (parameter) => !IsScanning
-             );
+            );
+
+            ConfirmDeletionCommand = new AsyncRelayCommand(
+                ExecuteConfirmDeletionAsync,
+                () => _deletionTargets.Any() && !IsScanning
+            );
+        }
+
+        private void RefreshCommands()
+        {
+            (ScanCommand as AsyncRelayCommand)?.OnCanExecuteChanged();
+            (ConfirmDeletionCommand as AsyncRelayCommand)?.OnCanExecuteChanged();
         }
 
         /// <summary>
@@ -138,6 +123,8 @@ namespace OsuSweep.ViewModels
             IsScanning = true;
             StatusMessage = "Analisando a pasta 'Songs'... Isso pode levar alguns minutos.";
             FoundBeatmaps.Clear();
+            _deletionTargets.Clear();
+            DeletionSummaryMessage = string.Empty;
 
             try
             {
@@ -149,7 +136,6 @@ namespace OsuSweep.ViewModels
                 }
 
                 StatusMessage = $"Análise concluída! {FoundBeatmaps.Count} pastas de beatmaps encontradas.";
-
                 await FetchAllBeatmapMetadataAsync();
             }
             catch (Exception ex)
@@ -166,30 +152,36 @@ namespace OsuSweep.ViewModels
         {
             // Filter the list to get only the beatmaps that have a valid ID.
             var beatmapsToFetch = FoundBeatmaps.Where(b => b.BeatmapSetId.HasValue).ToList();
-            if (!beatmapsToFetch.Any()) return;
+            if (!beatmapsToFetch.Any())
+            {
+                StatusMessage = "Análise concluída! Nenhum mapa com ID online foi encontrado.";
+                IsReadyForSelection = true;
+                return;
+            }
 
             int count = 0;
             foreach (var beatmap in beatmapsToFetch)
             {
                 count++;
-                StatusMessage = $"Buscando metadados... ({count}/{beatmapsToFetch.Count})";
+                if (count % 10 == 0 || count == beatmapsToFetch.Count)
+                {
+                    StatusMessage = $"Buscando metadados... ({count}/{beatmapsToFetch.Count})";
+                }
 
-                // Call the service to fetch the current beatmap data.
                 var metadata = await _beatmapService.GetBeatmapMetadataAsync(beatmap.BeatmapSetId!.Value);
-
                 if (metadata != null)
                 {
                     beatmap.Title = metadata.Title;
                     beatmap.Artist = metadata.Artist;
-                    beatmap.GameModes = metadata.Difficulties.Select(d => d.Mode).Distinct().ToList();
-                    beatmap.IsMetadataLoaded = true;
                     beatmap.Difficulties = metadata.Difficulties;
+                    beatmap.IsMetadataLoaded = true;
                 }
-
-                StatusMessage = "Busca de metadados concluída!";
-                IsReadyForSelection = true;
             }
+
+            StatusMessage = "Busca de metadados concluída!";
+            IsReadyForSelection = true;
         }
+
         /// <summary>
         /// Use the dialog service to let the user select the 'Songs' folder.
         /// </summary>
@@ -208,7 +200,7 @@ namespace OsuSweep.ViewModels
         /// </summary>
         private async Task UpdateDeletionPreviewAsync()
         {
-            Debug.WriteLine("Recalculando a pré visualização da deleção...");
+
 
             // Identify which modes the user has selected for deletion.
             var modesToDelete = new List<string>();
@@ -217,11 +209,12 @@ namespace OsuSweep.ViewModels
             if (DeleteCatch) modesToDelete.Add("catch");
             if (DeleteMania) modesToDelete.Add("mania");
 
-            Debug.WriteLine($"Modos selecionados para deleção: {string.Join(", ", modesToDelete)}");
+            _deletionTargets.Clear();
 
-            if (modesToDelete.Count == 0)
+            if (!modesToDelete.Any())
             {
                 DeletionSummaryMessage = string.Empty;
+                RefreshCommands();
                 return;
             }
 
@@ -230,27 +223,34 @@ namespace OsuSweep.ViewModels
                 IsScanning = true;
                 DeletionSummaryMessage = "Calculando....";
 
-                var deletionTargets = new List<string>();
-                var beatmapsAnalyzed = FoundBeatmaps.Where(b => b.IsMetadataLoaded && b.GameModes.Any());
-                foreach (var beatmap in beatmapsAnalyzed)
+                var targets = await Task.Run(() =>
                 {
-                    bool isFullDeletionTarget = !beatmap.GameModes.Except(modesToDelete).Any();
-                    if (isFullDeletionTarget)
+                    var list = new List<string>();
+                    var beatmapsAnalyzed = FoundBeatmaps.Where(b => b.IsMetadataLoaded && b.GameModes.Any());
+
+                    foreach (var beatmap in beatmapsAnalyzed)
                     {
-                        deletionTargets.Add(beatmap.FolderPath);
-                    }
-                    else
-                    {
-                        bool isPartialDeletionTarget = beatmap.GameModes.Any(mode => modesToDelete.Contains(mode));
-                        if (isPartialDeletionTarget)
+                        bool isFullDeletionTarget = !beatmap.GameModes.Except(modesToDelete).Any();
+                        if (isFullDeletionTarget)
                         {
-                            Debug.WriteLine($"[Deleção Parcial] A pasta '{beatmap.FolderPath}' contém modos a serem apagados.");
+                            list.Add(beatmap.FolderPath);
+                        }
+                        else if (beatmap.GameModes.Any(modesToDelete.Contains))
+                        {
+                            var filesToDelete = _beatmapService.GetFilePathsForPartialDeletion(beatmap, modesToDelete);
+                            list.AddRange(filesToDelete);
                         }
                     }
-                }
-                long totalSizeInBytes = await _beatmapService.CalculateTargetsSizeAsync(deletionTargets);
+                    return list;
+                });
 
-                DeletionSummaryMessage = $"{deletionTargets.Count} pastas a serem deletadas, liberando {FormatBytes(totalSizeInBytes)}";
+                _deletionTargets = targets;
+
+                long totalSizeInBytes = await _beatmapService.CalculateTargetsSizeAsync(_deletionTargets);
+                int folderCount = _deletionTargets.Count(Directory.Exists);
+                int fileCount = _deletionTargets.Count(File.Exists);
+
+                DeletionSummaryMessage = $"Alvos: {folderCount} pastas e {fileCount} arquivos, liberando {FormatBytes(totalSizeInBytes)}.";
             }
             catch (Exception ex)
             {
@@ -272,6 +272,31 @@ namespace OsuSweep.ViewModels
                 i++;
             }
             return $"{dblSByte:0.##} {suffixes[i]}";
+        }
+
+        private async Task ExecuteConfirmDeletionAsync()
+        {
+            string message = IsPermanentDelete
+                ? "Os arquivos serão apagados PERMANENTEMENTE. Esta ação não pode ser desfeita. \n\nDeseja continuar ?"
+                : "Os arquivos selecionados serão movidos para a Lixeira. \n\nDeseja continuar ?";
+
+            var result = MessageBox.Show(message, "Confirmação de Limpeza", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                IsScanning = true;
+                StatusMessage = "Limpando Arquivos...";
+                
+
+                await _beatmapService.DeleteTargetsAsync(_deletionTargets, IsPermanentDelete);
+
+                StatusMessage = "Limpeza concluida!";
+                _deletionTargets.Clear();
+                DeletionSummaryMessage = string.Empty;
+                FoundBeatmaps.Clear();
+
+                IsScanning = false;
+            }
         }
     }
 }

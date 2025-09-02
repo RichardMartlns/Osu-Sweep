@@ -8,7 +8,7 @@ namespace OsuSweep.Services
         {
             var dialog = new OpenFolderDialog
             {
-                Title = "Selecione a pasta 'Songs'do osu!"
+                Title = "Selecione a pasta 'Songs' do osu!"
             };
 
             if (dialog.ShowDialog() == true)

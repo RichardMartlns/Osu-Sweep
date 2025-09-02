@@ -3,7 +3,7 @@ using OsuSweep.Core.Models;
 using OsuSweep.Services;
 using OsuSweep.ViewModels;
 
-namespace OsuSweep.Tests
+namespace OsuSweep.Tests.ViewModels
 {
     [TestClass]
     public class MainViewModelTests

@@ -1,7 +1,7 @@
 ﻿using OsuSweep.Core.Models;
 using OsuSweep.Services;
 
-namespace OsuSweep.Tests
+namespace OsuSweep.Tests.Services
 {
     [TestClass]
     public class BeatmapServiceTest
@@ -84,7 +84,7 @@ namespace OsuSweep.Tests
                 Difficulties = new List<BeatmapDifficulty>
                 {
                     new BeatmapDifficulty { Version = "Hard", Mode = "osu" },
-                    new BeatmapDifficulty { Version = "Oni", Mode = "Taiko" },
+                    new BeatmapDifficulty { Version = "Oni", Mode = "taiko" },
                     new BeatmapDifficulty { Version = "Insane", Mode = "osu" }
                 }
             };
