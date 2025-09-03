@@ -9,8 +9,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Images\br.svg" />
+    <None Remove="Resources\Images\es.svg" />
+    <None Remove="Resources\Images\us.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
     <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
+    <PackageReference Include="SharpVectors.Wpf" Version="1.8.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,17 +25,29 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Resources\Resources.Designer.cs">
+    <Resource Include="Resources\Images\br.svg" />
+    <Resource Include="Resources\Images\es.svg" />
+    <Resource Include="Resources\Images\us.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\Strings.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
+      <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Resources\Resources.resx">
+    <EmbeddedResource Update="Resources\Strings.pt.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Strings.es.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Strings.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

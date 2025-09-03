@@ -1,4 +1,5 @@
 ﻿using OsuSweep.Services;
+using OsuSweep.Services.Localization;
 using OsuSweep.ViewModels;
 using System.Windows;
 
@@ -13,7 +14,7 @@ namespace OsuSweep.Views
         {
             InitializeComponent();
             
-            DataContext = new MainViewModel (new FolderDialogService(), new BeatmapService());
+            DataContext = new MainViewModel (new FolderDialogService(), new BeatmapService(), new LocalizationService());
         }
     }
 }

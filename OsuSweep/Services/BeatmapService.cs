@@ -79,16 +79,7 @@ namespace OsuSweep.Services
             }
         }
 
-        /// <summary>
-        /// Attempts to extract a numeric ID from the beginning of a string (folder name) using Regex.
-        /// </summary>
-        /// <param name="folderName">The name of the folder to parse.</param>
-        /// <returns>The extracted ID as an integer, or null if no leading digits are found.</returns>
-        /// <remarks>
-        /// This method uses the regular expression pattern "^(\d+)" to find one or more digits
-        /// at the absolute start of the string. It is robust against different separators
-        /// (or no separator at all) following the ID.
-        /// </remarks>
+
         public int? TryExtractIdFromName(string folderName)
         {
             var match = Regex.Match(folderName, @"^(\d+)");
@@ -134,15 +125,7 @@ namespace OsuSweep.Services
             });
         }
 
-        /// <summary>
-        /// Recursively calculates the total size of all files within a single directory.
-        /// </summary>
-        /// <param name="folderPath">The absolute path of the directory to measure.</param>
-        /// <returns>The total size in bytes (long). Returns 0 if the directory is not found or an error occurs.</returns>
-        /// <remarks>
-        /// This method uses SearchOption.AllDirectories to include files in all subfolders.
-        /// It's wrapped in a try-catch to safely handle potential exceptions like DirectoryNotFoundException.
-        /// </remarks>
+   
         private long GetDirectorySize(string folderPath)
         {
             try

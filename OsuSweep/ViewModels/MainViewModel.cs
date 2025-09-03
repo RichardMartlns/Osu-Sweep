@@ -1,5 +1,6 @@
 ﻿using OsuSweep.Core.Models;
 using OsuSweep.Services;
+using OsuSweep.Services.Localization;
 using OsuSweep.ViewModels.Base;
 using OsuSweep.ViewModels.Commands;
 using System.Collections.ObjectModel;
@@ -14,6 +15,7 @@ namespace OsuSweep.ViewModels
     {
         private readonly IBeatmapService _beatmapService;
         private readonly IFolderDialogService _folderDialogService;
+        private readonly ILocalizationService _localizationService;
 
         private List<string> _deletionTargets = new();
         private string _selectedFolderPath = string.Empty;
@@ -28,6 +30,7 @@ namespace OsuSweep.ViewModels
         private bool _isPermanentDelete;
 
         public ObservableCollection<BeatmapSet> FoundBeatmaps { get; } = new();
+        public Action ?RequestViewRestart { get; set; }
 
 
         public string SelectedFolderPath
@@ -82,11 +85,16 @@ namespace OsuSweep.ViewModels
         public ICommand ScanCommand { get; }
         public ICommand SelectFolderCommand { get; }
         public ICommand ConfirmDeletionCommand { get; }
+        public ICommand SetLanguageToEnglishCommand { get; }
+        public ICommand SetLanguageToPortugueseCommand { get; }
+        public ICommand SetLanguageToSpanishCommand { get; }
 
-        public MainViewModel(IFolderDialogService folderDialogService, IBeatmapService beatmapService)
+
+        public MainViewModel(IFolderDialogService folderDialogService, IBeatmapService beatmapService, ILocalizationService localizationService)
         {
             _beatmapService = beatmapService;
             _folderDialogService = folderDialogService;
+            _localizationService = localizationService;
 
 
             ScanCommand = new AsyncRelayCommand(
@@ -104,6 +112,16 @@ namespace OsuSweep.ViewModels
                 ExecuteConfirmDeletionAsync,
                 () => _deletionTargets.Any() && !IsScanning
             );
+
+            SetLanguageToEnglishCommand = new RelayCommand( _ => ChangeLanguage("en-US"));
+            SetLanguageToPortugueseCommand = new RelayCommand( _ => ChangeLanguage("pt-BR"));
+            SetLanguageToSpanishCommand = new RelayCommand( _ => ChangeLanguage("es-ES"));
+        }
+
+        private void ChangeLanguage(string cultureCode)
+        {
+            _localizationService.SetLanguage(cultureCode);
+            RequestViewRestart?.Invoke();
         }
 
         private void RefreshCommands()
