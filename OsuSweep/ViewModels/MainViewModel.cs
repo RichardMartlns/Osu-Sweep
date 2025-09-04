@@ -95,9 +95,9 @@ namespace OsuSweep.ViewModels
 
         public ObservableCollection<LanguageModel> AvailableLanguages { get; } = new()
     {
-        new LanguageModel { DisplayName = "English", CultureCode = "en-US", IconPath = "/OsuSweep;component/Resources/Images/us.svg" },
-        new LanguageModel { DisplayName = "Português", CultureCode = "pt-BR", IconPath = "/OsuSweep;component/Resources/Images/br.svg" },
-        new LanguageModel { DisplayName = "Español", CultureCode = "es-ES", IconPath = "/OsuSweep;component/Resources/Images/es.svg" }
+        new LanguageModel { DisplayName = "English", CultureCode = "en-US", IconPath = "/OsuSweep;component/Resources/Images/flag_us.svg" },
+        new LanguageModel { DisplayName = "Português", CultureCode = "pt-BR", IconPath = "/OsuSweep;component/Resources/Images/flag_br.svg" },
+        new LanguageModel { DisplayName = "Español", CultureCode = "es-ES", IconPath = "/OsuSweep;component/Resources/Images/test_icon.svg" }
     };
 
         public bool DeleteOsu { get => _deleteOsu; set { if (SetProperty(ref _deleteOsu, value)) _ = UpdateDeletionPreviewAsync(); } }
@@ -137,8 +137,8 @@ namespace OsuSweep.ViewModels
 
 
             var currentCultureName = CultureInfo.CurrentUICulture.Name;
-            
             _selectedLanguage = AvailableLanguages.FirstOrDefault(lang => lang.CultureCode == currentCultureName) ?? AvailableLanguages.First();
+            ChangeLanguage(_selectedLanguage.CultureCode);
         }
 
         private void ChangeLanguage(string cultureCode)

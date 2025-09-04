@@ -17,17 +17,12 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
     <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
+    <PackageReference Include="SharpVectors" Version="1.8.5" />
     <PackageReference Include="SharpVectors.Wpf" Version="1.8.5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\OsuSweep.Core\OsuSweep.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Resources\Images\br.svg" />
-    <Resource Include="Resources\Images\es.svg" />
-    <Resource Include="Resources\Images\us.svg" />
   </ItemGroup>
 
   <ItemGroup>

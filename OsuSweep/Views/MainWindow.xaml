@@ -2,11 +2,12 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:p="clr-namespace:OsuSweep.Resources"
-        xmlns:svg="http://sharpvectors.codeplex.com/runtime/"
+        xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
         xmlns:models="clr-namespace:OsuSweep.Core.Models;assembly=OsuSweep.Core"
-        
+        xmlns:vm="clr-namespace:OsuSweep.ViewModels"
         Title="{x:Static p:Strings.WindowTitle}" Height="450" Width="800">
-
+    
+    
     <Grid>
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="245,10,0,0">
             <TextBlock FontSize="20" Margin="0,0,0,20">
@@ -31,7 +32,7 @@
 
             <TextBlock Text="{Binding StatusMessage}" Margin="0,10,0,0"/>
 
-            <GroupBox Header=" Selecione os modos de jogo para apagar" Margin="0,20,0,0" FontWeight="Bold" IsEnabled="{Binding IsReadyForSelection}">
+            <GroupBox Header="Selecione os modos de jogo para apagar" Margin="0,20,0,0" FontWeight="Bold" IsEnabled="{Binding IsReadyForSelection}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
                     <CheckBox Content="Osu!"
                               IsChecked="{Binding DeleteOsu, Mode=TwoWay}"
@@ -47,6 +48,41 @@
                               Margin="5"/>
                 </StackPanel>
             </GroupBox>
+
+            <ComboBox HorizontalAlignment="Right" 
+                      VerticalAlignment="Top" 
+                      Margin="10"
+                      VerticalContentAlignment="Center"
+                      ItemsSource="{Binding AvailableLanguages}"
+                      SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
+                      BorderThickness="0"
+                      Background="Transparent"
+                      Width="150">
+
+                <ComboBox.Resources>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Opacity" Value="1" />
+                        <Setter Property="Visibility" Value="Visible" />
+                        <Setter Property="Foreground" Value="Black" />
+                    </Style>
+                </ComboBox.Resources>
+
+                <ComboBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type models:LanguageModel}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+
+                            <Image Source="{Binding IconPath}" 
+                       Width="24" Height="24" 
+                       Margin="0,0,8,0" />
+
+                            <TextBlock Text="{Binding DisplayName}" 
+                           VerticalAlignment="Center" 
+                           FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+
+            </ComboBox>
         </StackPanel>
     </Grid>
 </Window>
