@@ -3,6 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:p="clr-namespace:OsuSweep.Resources"
         xmlns:svg="http://sharpvectors.codeplex.com/runtime/"
+        xmlns:models="clr-namespace:OsuSweep.Core.Models;assembly=OsuSweep.Core"
+        
         Title="{x:Static p:Strings.WindowTitle}" Height="450" Width="800">
 
     <Grid>
@@ -45,40 +47,6 @@
                               Margin="5"/>
                 </StackPanel>
             </GroupBox>
-            <TextBlock Text="{Binding DeletionSummaryMessage}" Margin="0,10,0,0" FontSize="14" FontWeight="SemiBold"/>
-
-            <StackPanel Margin="0,15,0,0">
-                <CheckBox Content="Deleção Permanente (não vai para a Lixeira)"
-              IsChecked="{Binding IsPermanentDelete, Mode=TwoWay}"
-              Foreground="OrangeRed"
-              Margin="0,0,0,10"/>
-
-                <Button Content="Confirmar Limpeza"
-            Command="{Binding ConfirmDeletionCommand}"
-            Padding="10,5"
-            FontWeight="Bold"
-            Background="#FF4D4D"/>
-            </StackPanel>
-        </StackPanel>
-        <StackPanel>
-            <Button Command="{Binding SetLanguageToEnglishCommand}"
-             ToolTip="English"
-             Width="40" Height="30" 
-             Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                <svg:SvgDrawingCanvas svg:SvgLink.Location="/OsuSweep;component/Resources/Images/us.svg"/>
-            </Button>
-            <Button Command="{Binding SetLanguageToPortugueseCommand}"
-             ToolTip="Português"
-             Width="40" Height="30" Margin="10,0"
-             Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                <svg:SvgDrawingCanvas svg:SvgLink.Location="/OsuSweep;component/Resources/Images/pt.svg"/>
-            </Button>
-            <Button Command="{Binding SetLanguageToSpanishCommand}"
-             ToolTip="Español"
-             Width="40" Height="30"
-             Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                <svg:SvgDrawingCanvas svg:SvgLink.Location="/OsuSweep;component/Resources/Images/es.svg"/>
-            </Button>
         </StackPanel>
     </Grid>
 </Window>

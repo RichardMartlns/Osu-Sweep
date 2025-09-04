@@ -1,4 +1,7 @@
-﻿using System.Text;
+﻿using OsuSweep.Services;
+using OsuSweep.Services.Localization;
+using OsuSweep.ViewModels;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,6 +22,10 @@ namespace OsuSweep
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new MainViewModel(
+                new FolderDialogService(),
+                new BeatmapService(),
+                new LocalizationService());
         }
     }
 }

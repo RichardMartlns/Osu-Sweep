@@ -1,9 +1,11 @@
 ﻿using OsuSweep.Core.Models;
+using OsuSweep.Core.Utils;
 using OsuSweep.Services;
 using OsuSweep.Services.Localization;
 using OsuSweep.ViewModels.Base;
 using OsuSweep.ViewModels.Commands;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -15,7 +17,7 @@ namespace OsuSweep.ViewModels
     {
         private readonly IBeatmapService _beatmapService;
         private readonly IFolderDialogService _folderDialogService;
-        private readonly ILocalizationService _localizationService;
+        private readonly ILocalizationService _localizationService;      
 
         private List<string> _deletionTargets = new();
         private string _selectedFolderPath = string.Empty;
@@ -28,7 +30,9 @@ namespace OsuSweep.ViewModels
         private bool _deleteCatch;
         private bool _deleteMania;
         private bool _isPermanentDelete;
+        private LanguageModel _selectedLanguage;
 
+       
         public ObservableCollection<BeatmapSet> FoundBeatmaps { get; } = new();
         public Action ?RequestViewRestart { get; set; }
 
@@ -77,6 +81,25 @@ namespace OsuSweep.ViewModels
             set => SetProperty(ref _isPermanentDelete, value);
         }
 
+       public LanguageModel SelectedLanguage
+        {
+            get => _selectedLanguage;
+            set
+            {
+                if (SetProperty(ref _selectedLanguage, value))
+                {
+                    ChangeLanguage(value.CultureCode);
+                }
+            }
+        }
+
+        public ObservableCollection<LanguageModel> AvailableLanguages { get; } = new()
+    {
+        new LanguageModel { DisplayName = "English", CultureCode = "en-US", IconPath = "/OsuSweep;component/Resources/Images/us.svg" },
+        new LanguageModel { DisplayName = "Português", CultureCode = "pt-BR", IconPath = "/OsuSweep;component/Resources/Images/br.svg" },
+        new LanguageModel { DisplayName = "Español", CultureCode = "es-ES", IconPath = "/OsuSweep;component/Resources/Images/es.svg" }
+    };
+
         public bool DeleteOsu { get => _deleteOsu; set { if (SetProperty(ref _deleteOsu, value)) _ = UpdateDeletionPreviewAsync(); } }
         public bool DeleteTaiko { get => _deleteTaiko; set { if (SetProperty(ref _deleteTaiko, value)) _ = UpdateDeletionPreviewAsync(); } }
         public bool DeleteCatch { get => _deleteCatch; set { if (SetProperty(ref _deleteCatch, value)) _ = UpdateDeletionPreviewAsync(); } }
@@ -85,9 +108,8 @@ namespace OsuSweep.ViewModels
         public ICommand ScanCommand { get; }
         public ICommand SelectFolderCommand { get; }
         public ICommand ConfirmDeletionCommand { get; }
-        public ICommand SetLanguageToEnglishCommand { get; }
-        public ICommand SetLanguageToPortugueseCommand { get; }
-        public ICommand SetLanguageToSpanishCommand { get; }
+
+
 
 
         public MainViewModel(IFolderDialogService folderDialogService, IBeatmapService beatmapService, ILocalizationService localizationService)
@@ -113,9 +135,10 @@ namespace OsuSweep.ViewModels
                 () => _deletionTargets.Any() && !IsScanning
             );
 
-            SetLanguageToEnglishCommand = new RelayCommand( _ => ChangeLanguage("en-US"));
-            SetLanguageToPortugueseCommand = new RelayCommand( _ => ChangeLanguage("pt-BR"));
-            SetLanguageToSpanishCommand = new RelayCommand( _ => ChangeLanguage("es-ES"));
+
+            var currentCultureName = CultureInfo.CurrentUICulture.Name;
+            
+            _selectedLanguage = AvailableLanguages.FirstOrDefault(lang => lang.CultureCode == currentCultureName) ?? AvailableLanguages.First();
         }
 
         private void ChangeLanguage(string cultureCode)
@@ -268,7 +291,7 @@ namespace OsuSweep.ViewModels
                 int folderCount = _deletionTargets.Count(Directory.Exists);
                 int fileCount = _deletionTargets.Count(File.Exists);
 
-                DeletionSummaryMessage = $"Alvos: {folderCount} pastas e {fileCount} arquivos, liberando {FormatBytes(totalSizeInBytes)}.";
+                DeletionSummaryMessage = $"Alvos: {folderCount} pastas e {fileCount} arquivos, liberando {FormattingUtils.FormatBytes(totalSizeInBytes)}.";
             }
             catch (Exception ex)
             {
@@ -279,18 +302,7 @@ namespace OsuSweep.ViewModels
                 IsScanning = false;
             }
         }
-        private static string FormatBytes(long bytes)
-        {
-            string[] suffixes = { "B", "KB", "MB", "GB", "TB" };
-            int i = 0;
-            double dblSByte = bytes;
-            while (dblSByte >= 1024 && i < suffixes.Length - 1)
-            {
-                dblSByte /= 1024;
-                i++;
-            }
-            return $"{dblSByte:0.##} {suffixes[i]}";
-        }
+
 
         private async Task ExecuteConfirmDeletionAsync()
         {
