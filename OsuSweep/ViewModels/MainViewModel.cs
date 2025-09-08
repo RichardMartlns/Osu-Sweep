@@ -17,7 +17,7 @@ namespace OsuSweep.ViewModels
     {
         private readonly IBeatmapService _beatmapService;
         private readonly IFolderDialogService _folderDialogService;
-        private readonly ILocalizationService _localizationService;      
+        private readonly ILocalizationService _localizationService;
 
         private List<string> _deletionTargets = new();
         private string _selectedFolderPath = string.Empty;
@@ -32,9 +32,9 @@ namespace OsuSweep.ViewModels
         private bool _isPermanentDelete;
         private LanguageModel _selectedLanguage;
 
-       
+
         public ObservableCollection<BeatmapSet> FoundBeatmaps { get; } = new();
-        public Action ?RequestViewRestart { get; set; }
+        public Action? RequestViewRestart { get; set; }
 
 
         public string SelectedFolderPath
@@ -81,7 +81,7 @@ namespace OsuSweep.ViewModels
             set => SetProperty(ref _isPermanentDelete, value);
         }
 
-       public LanguageModel SelectedLanguage
+        public LanguageModel SelectedLanguage
         {
             get => _selectedLanguage;
             set
@@ -95,9 +95,9 @@ namespace OsuSweep.ViewModels
 
         public ObservableCollection<LanguageModel> AvailableLanguages { get; } = new()
     {
-        new LanguageModel { DisplayName = "English", CultureCode = "en-US", IconPath = "/OsuSweep;component/Resources/Images/flag_us.svg" },
-        new LanguageModel { DisplayName = "Português", CultureCode = "pt-BR", IconPath = "/OsuSweep;component/Resources/Images/flag_br.svg" },
-        new LanguageModel { DisplayName = "Español", CultureCode = "es-ES", IconPath = "/OsuSweep;component/Resources/Images/test_icon.svg" }
+        new LanguageModel { DisplayName = "English", CultureCode = "en-US", IconPath = "/OsuSweep;component/Resources/Images/flag_us.png" },
+        new LanguageModel { DisplayName = "Português", CultureCode = "pt-BR", IconPath = "/OsuSweep;component/Resources/Images/flag_br.png" },
+        new LanguageModel { DisplayName = "Español", CultureCode = "es-ES", IconPath = "/OsuSweep;component/Resources/Images/flag_es.png" }
     };
 
         public bool DeleteOsu { get => _deleteOsu; set { if (SetProperty(ref _deleteOsu, value)) _ = UpdateDeletionPreviewAsync(); } }
@@ -162,7 +162,7 @@ namespace OsuSweep.ViewModels
 
             IsReadyForSelection = false;
             IsScanning = true;
-            StatusMessage = "Analisando a pasta 'Songs'... Isso pode levar alguns minutos.";
+            StatusMessage = "";
             FoundBeatmaps.Clear();
             _deletionTargets.Clear();
             DeletionSummaryMessage = string.Empty;
@@ -316,7 +316,7 @@ namespace OsuSweep.ViewModels
             {
                 IsScanning = true;
                 StatusMessage = "Limpando Arquivos...";
-                
+
 
                 await _beatmapService.DeleteTargetsAsync(_deletionTargets, IsPermanentDelete);
 

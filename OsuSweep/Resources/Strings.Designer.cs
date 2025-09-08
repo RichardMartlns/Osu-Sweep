@@ -61,6 +61,24 @@ namespace OsuSweep.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please, select your Osu! &apos;Songs&apos; folder.
+        /// </summary>
+        public static string SelectFolderLabel {
+            get {
+                return ResourceManager.GetString("SelectFolderLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Welcome to Osu! Sweep!.
+        /// </summary>
+        public static string WelcomeMessage {
+            get {
+                return ResourceManager.GetString("WelcomeMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Osu! Sweep - The Smart Beatmap Cleaner.
         /// </summary>
         public static string WindowTitle {

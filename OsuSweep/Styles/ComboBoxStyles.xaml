@@ -1,0 +1,11 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style TargetType="ComboBoxItem">
+        <Setter Property="Opacity" Value="1" />
+        <Setter Property="Visibility" Value="Visible" />
+        <Setter Property="Foreground" Value="Black" />
+        <Setter Property="Clip" Value="{x:Null}" />
+    </Style>
+
+</ResourceDictionary>

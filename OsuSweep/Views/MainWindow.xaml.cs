@@ -1,9 +1,7 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using SharpVectors.Converters;
-using OsuSweep.Services;
+﻿using OsuSweep.Services;
 using OsuSweep.Services.Localization;
 using OsuSweep.ViewModels;
+using System.Windows;
 
 namespace OsuSweep.Views
 {
@@ -13,23 +11,23 @@ namespace OsuSweep.Views
         {
             InitializeComponent();
 
-            var folderDialogService = new FolderDialogService(); // Implemente ou use um mock
-            var beatmapService = new BeatmapService(); // Implemente ou use um mock
-            var localizationService = new LocalizationService();
-
-            DataContext = new MainViewModel(folderDialogService, beatmapService, localizationService);
+            this.DataContextChanged += MainWindow_DataContextChanged;
         }
 
-        private void SvgViewbox_Loaded(object sender, RoutedEventArgs e)
+        private void MainWindow_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var svgViewbox = sender as SvgViewbox;
-            if (svgViewbox == null || svgViewbox.Source == null)
+            if (e.NewValue is MainViewModel viewModel)
             {
-                System.Diagnostics.Debug.WriteLine("SvgViewbox não carregou o recurso: " + (svgViewbox?.Source?.ToString() ?? "Nulo"));
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("SvgViewbox carregado com sucesso: " + svgViewbox.Source);
+                viewModel.RequestViewRestart = () =>
+                {
+                    var newWindow = new MainWindow
+                    {
+                        DataContext = this.DataContext
+                    };
+
+                    newWindow.Show();
+                    this.Close();
+                };
             }
         }
     }
