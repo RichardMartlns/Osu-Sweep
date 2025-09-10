@@ -94,11 +94,25 @@ namespace OsuSweep.ViewModels
         }
 
         public ObservableCollection<LanguageModel> AvailableLanguages { get; } = new()
-    {
-        new LanguageModel { DisplayName = "English", CultureCode = "en-US", IconPath = "/OsuSweep;component/Resources/Images/flag_us.png" },
-        new LanguageModel { DisplayName = "Português", CultureCode = "pt-BR", IconPath = "/OsuSweep;component/Resources/Images/flag_br.png" },
-        new LanguageModel { DisplayName = "Español", CultureCode = "es-ES", IconPath = "/OsuSweep;component/Resources/Images/flag_es.png" }
-    };
+        {
+            new LanguageModel { DisplayName = "English", CultureCode = "en-US", IconPath = "/OsuSweep;component/Resources/Images/flag_us.png" },
+            new LanguageModel { DisplayName = "Português", CultureCode = "pt-BR", IconPath = "/OsuSweep;component/Resources/Images/flag_br.png" },
+            new LanguageModel { DisplayName = "Español", CultureCode = "es-ES", IconPath = "/OsuSweep;component/Resources/Images/flag_es.png" }
+        };
+
+        private string ConvertModeIdToName(int modeId)
+        {
+            switch (modeId)
+            {
+                case 0: return "osu";
+                case 1: return "taiko";
+                case 2: return "catch";
+                case 3: return "mania";
+
+                default: 
+                    return "unknown";
+            }
+        }
 
         public bool DeleteOsu { get => _deleteOsu; set { if (SetProperty(ref _deleteOsu, value)) _ = UpdateDeletionPreviewAsync(); } }
         public bool DeleteTaiko { get => _deleteTaiko; set { if (SetProperty(ref _deleteTaiko, value)) _ = UpdateDeletionPreviewAsync(); } }
@@ -200,26 +214,24 @@ namespace OsuSweep.ViewModels
                 return;
             }
 
-            int count = 0;
+            var tasks = new List<Task>();
+
             foreach (var beatmap in beatmapsToFetch)
             {
-                count++;
-                if (count % 10 == 0 || count == beatmapsToFetch.Count)
+                
+                if (beatmap.BeatmapSetId.HasValue)
                 {
-                    StatusMessage = $"Buscando metadados... ({count}/{beatmapsToFetch.Count})";
+                    tasks.Add(ProcessApiBeatmapAsync(beatmap));
                 }
-
-                var metadata = await _beatmapService.GetBeatmapMetadataAsync(beatmap.BeatmapSetId!.Value);
-                if (metadata != null)
+                else
                 {
-                    beatmap.Title = metadata.Title;
-                    beatmap.Artist = metadata.Artist;
-                    beatmap.Difficulties = metadata.Difficulties;
-                    beatmap.IsMetadataLoaded = true;
+                    tasks.Add(ProcessManualBeatmapAsync(beatmap));
                 }
             }
 
-            StatusMessage = "Busca de metadados concluída!";
+            await Task.WhenAll(tasks);
+
+            StatusMessage = "Analise completa!";
             IsReadyForSelection = true;
         }
 
@@ -327,6 +339,31 @@ namespace OsuSweep.ViewModels
 
                 IsScanning = false;
             }
+        }
+
+        private async Task ProcessApiBeatmapAsync(BeatmapSet beatmap)
+        {
+            var metadata = await _beatmapService.GetBeatmapMetadataAsync(beatmap.BeatmapSetId!.Value);
+            if (metadata != null)
+            {
+                beatmap.Title = metadata.Title;
+                beatmap.Artist = metadata.Artist;
+                beatmap.Difficulties = metadata.Difficulties;
+                beatmap.IsMetadataLoaded = true;
+            }
+        }
+
+        private async Task ProcessManualBeatmapAsync(BeatmapSet beatmap)
+        {
+            await Task.Run(() =>
+            {
+                var modeIds = _beatmapService.GetModesFromBeatmapSetFolder(beatmap.FolderPath);
+
+                var modeNames = modeIds.Select(id => ConvertModeIdToName(id)).ToList();
+
+                beatmap.GameModes = modeNames;
+                beatmap.IsMetadataLoaded = true;
+            });
         }
     }
 }

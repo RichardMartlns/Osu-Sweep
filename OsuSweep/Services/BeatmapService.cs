@@ -234,5 +234,71 @@ namespace OsuSweep.Services
         {
             throw new NotImplementedException();
         }
+
+        public List<int> GetModesFromBeatmapSetFolder(string folderPath)
+        {
+
+            var foundModes = new HashSet<int>();
+
+            try
+            {
+                
+                var osuFiles = Directory.GetFiles(folderPath, "*.osu");
+
+                foreach (var osuFile in osuFiles)
+                {
+
+                    var mode = ParseOsuFileForMode(osuFile);
+
+                    if (mode.HasValue)
+                    {
+                        foundModes.Add(mode.Value);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erro ao analisar a pasta {folderPath}: {ex.Message}");
+            }
+
+            return foundModes.ToList();
+        }
+
+        private int? ParseOsuFileForMode(string osuFilePath)
+        {
+            try
+            {
+                var headerLines = File.ReadLines(osuFilePath).Take(30);
+
+                foreach (var line in headerLines)
+                {
+                    var trimmedLine = line.Trim();
+
+                    if (trimmedLine.StartsWith("Mode:"))
+                    {
+                        var parts = trimmedLine.Split(':');
+
+                        if (parts.Length > 1)
+                        {
+                            string numberText = parts[1].Trim();
+
+                            if (int.TryParse(numberText, out int extractedMode))
+                            {
+                                return extractedMode;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erro ao parsear o arquivo {osuFilePath}: {ex.Message} ");
+            }
+
+            return null;
+        }
     }
 }

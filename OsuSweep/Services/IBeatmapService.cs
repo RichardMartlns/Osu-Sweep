@@ -7,10 +7,10 @@ namespace OsuSweep.Services
     {
         Task<List<BeatmapSet>> ScanSongsFolderAsync(string songsFolderPath);
         Task<ApiBeatmapData?> GetBeatmapMetadataAsync(int beatmapId);
-        int? TryExtractIdFromName(string folderName);
         Task<long> CalculateTargetsSizeAsync(List<string> targets);
-        List<string> GetFilePathsForPartialDeletion(BeatmapSet beatmap, IEnumerable<string> modesToDelete);
         Task DeleteTargetsAsync(List<string> targets, bool isPermanent);
-
+        List<string> GetFilePathsForPartialDeletion(BeatmapSet beatmap, IEnumerable<string> modesToDelete);
+        List<int> GetModesFromBeatmapSetFolder(string folderPath);
+        int? TryExtractIdFromName(string folderName);
     }
 }
