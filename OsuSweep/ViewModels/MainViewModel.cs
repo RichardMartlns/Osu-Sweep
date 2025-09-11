@@ -15,14 +15,17 @@ namespace OsuSweep.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
+        #region Private fields
         private readonly IBeatmapService _beatmapService;
         private readonly IFolderDialogService _folderDialogService;
         private readonly ILocalizationService _localizationService;
+        private readonly IDeletionService _deletionService;
 
+        // Internal state
         private List<string> _deletionTargets = new();
         private string _selectedFolderPath = string.Empty;
         private string _deletionSummaryMessage = string.Empty;
-        private string _statusMessage = "Pronto para começar!";
+        private string _statusMessage = "Ready to start!";
         private bool _isScanning;
         private bool _isReadyForSelection;
         private bool _deleteOsu;
@@ -31,11 +34,11 @@ namespace OsuSweep.ViewModels
         private bool _deleteMania;
         private bool _isPermanentDelete;
         private LanguageModel _selectedLanguage;
+        #endregion
 
-
+        #region Public properties (bindable)
         public ObservableCollection<BeatmapSet> FoundBeatmaps { get; } = new();
         public Action? RequestViewRestart { get; set; }
-
 
         public string SelectedFolderPath
         {
@@ -100,37 +103,26 @@ namespace OsuSweep.ViewModels
             new LanguageModel { DisplayName = "Español", CultureCode = "es-ES", IconPath = "/OsuSweep;component/Resources/Images/flag_es.png" }
         };
 
-        private string ConvertModeIdToName(int modeId)
-        {
-            switch (modeId)
-            {
-                case 0: return "osu";
-                case 1: return "taiko";
-                case 2: return "catch";
-                case 3: return "mania";
-
-                default: 
-                    return "unknown";
-            }
-        }
-
+        // Bindings for checkboxes (execute a preview update when they change)
         public bool DeleteOsu { get => _deleteOsu; set { if (SetProperty(ref _deleteOsu, value)) _ = UpdateDeletionPreviewAsync(); } }
         public bool DeleteTaiko { get => _deleteTaiko; set { if (SetProperty(ref _deleteTaiko, value)) _ = UpdateDeletionPreviewAsync(); } }
         public bool DeleteCatch { get => _deleteCatch; set { if (SetProperty(ref _deleteCatch, value)) _ = UpdateDeletionPreviewAsync(); } }
         public bool DeleteMania { get => _deleteMania; set { if (SetProperty(ref _deleteMania, value)) _ = UpdateDeletionPreviewAsync(); } }
+        #endregion
 
+        #region Commands
         public ICommand ScanCommand { get; }
         public ICommand SelectFolderCommand { get; }
         public ICommand ConfirmDeletionCommand { get; }
+        #endregion
 
-
-
-
-        public MainViewModel(IFolderDialogService folderDialogService, IBeatmapService beatmapService, ILocalizationService localizationService)
+        #region Constructor
+        public MainViewModel(IFolderDialogService folderDialogService, IBeatmapService beatmapService, ILocalizationService localizationService, IDeletionService deletionService)
         {
             _beatmapService = beatmapService;
             _folderDialogService = folderDialogService;
             _localizationService = localizationService;
+            _deletionService = deletionService;
 
 
             ScanCommand = new AsyncRelayCommand(
@@ -154,22 +146,32 @@ namespace OsuSweep.ViewModels
             _selectedLanguage = AvailableLanguages.FirstOrDefault(lang => lang.CultureCode == currentCultureName) ?? AvailableLanguages.First();
             ChangeLanguage(_selectedLanguage.CultureCode);
         }
+        #endregion
 
+        #region Language/Localization
         private void ChangeLanguage(string cultureCode)
         {
             _localizationService.SetLanguage(cultureCode);
             RequestViewRestart?.Invoke();
         }
+        #endregion
 
+        #region Command Utilities
         private void RefreshCommands()
         {
             (ScanCommand as AsyncRelayCommand)?.OnCanExecuteChanged();
             (ConfirmDeletionCommand as AsyncRelayCommand)?.OnCanExecuteChanged();
         }
+        #endregion
 
+        #region Folder scanning / metadata
         /// <summary>
-        /// Orchestrates the entire analysis process, starting with folder scanning and then fetching the metadata.
+        /// Starts the complete beatmap analysis pipeline from a folder path.
         /// </summary>
+        /// <remarks>
+        /// This is the main entry point for the scan functionality. It clears the previous state,
+        /// runs the initial folder scan, and then triggers the detailed metadata fetching.
+        /// </remarks>
         private async Task StartScanAsync(string songsFolderPath)
         {
             if (string.IsNullOrEmpty(songsFolderPath)) return;
@@ -190,12 +192,12 @@ namespace OsuSweep.ViewModels
                     FoundBeatmaps.Add(beatmapSet);
                 }
 
-                StatusMessage = $"Análise concluída! {FoundBeatmaps.Count} pastas de beatmaps encontradas.";
+                StatusMessage = $"Analysis complete! {FoundBeatmaps.Count} beatmap folders found.";
                 await FetchAllBeatmapMetadataAsync();
             }
             catch (Exception ex)
             {
-                StatusMessage = $"Ocorreu um erro: {ex.Message}";
+                StatusMessage = $"An error occurred: {ex.Message}";
             }
             finally
             {
@@ -203,6 +205,13 @@ namespace OsuSweep.ViewModels
             }
         }
 
+        /// <summary>
+        /// Orchestrates the metadata fetching for the list of already found beatmaps.
+        /// </summary>
+        /// <remarks>
+        /// For each beatmap, it decides whether to fetch data via API (if an ID exists)
+        /// or perform a manual parsing of local files. The tasks are executed in parallel for greater efficiency.
+        /// </remarks>
         private async Task FetchAllBeatmapMetadataAsync()
         {
 
@@ -210,7 +219,7 @@ namespace OsuSweep.ViewModels
 
             if (!allBeatmaps.Any())
             {
-                StatusMessage = "Análise concluída! Nenhum mapa com ID online foi encontrado.";
+                StatusMessage = "Analysis complete! No maps with an online ID were found.";
                 IsReadyForSelection = true;
                 return;
             }
@@ -220,7 +229,6 @@ namespace OsuSweep.ViewModels
             foreach (var beatmap in allBeatmaps)
             {
                 
-                bool hasApiId = beatmap.BeatmapSetId.HasValue;
                 if (beatmap.BeatmapSetId.HasValue)
                 {
                     tasks.Add(ProcessApiBeatmapAsync(beatmap));
@@ -236,7 +244,7 @@ namespace OsuSweep.ViewModels
                 await Task.WhenAll(tasks);
             }
 
-            StatusMessage = "Analise completa!";
+            StatusMessage = "Analysis complete!";
             IsReadyForSelection = true;
         }
 
@@ -251,6 +259,7 @@ namespace OsuSweep.ViewModels
                 SelectedFolderPath = selectedPath;
             }
         }
+        #endregion
 
         /// <summary>
         /// Triggered when a game mode selection changes.
@@ -258,61 +267,34 @@ namespace OsuSweep.ViewModels
         /// </summary>
         private async Task UpdateDeletionPreviewAsync()
         {
-
-
-            // Identify which modes the user has selected for deletion.
             var modesToDelete = new List<string>();
             if (DeleteOsu) modesToDelete.Add("osu");
             if (DeleteTaiko) modesToDelete.Add("taiko");
             if (DeleteCatch) modesToDelete.Add("catch");
             if (DeleteMania) modesToDelete.Add("mania");
 
-            _deletionTargets.Clear();
-
             if (!modesToDelete.Any())
             {
                 DeletionSummaryMessage = string.Empty;
+                _deletionTargets.Clear();
                 RefreshCommands();
                 return;
             }
-
+            
             try
             {
                 IsScanning = true;
-                DeletionSummaryMessage = "Calculando....";
+                DeletionSummaryMessage = "Calculating...";
 
-                var targets = await Task.Run(() =>
-                {
-                    var list = new List<string>();
-                    var beatmapsAnalyzed = FoundBeatmaps.Where(b => b.IsMetadataLoaded && b.GameModes.Any());
+                var result = await _deletionService.CalculateDeletionPreviewAsync(FoundBeatmaps, modesToDelete);
 
-                    foreach (var beatmap in beatmapsAnalyzed)
-                    {
-                        bool isFullDeletionTarget = !beatmap.GameModes.Except(modesToDelete).Any();
-                        if (isFullDeletionTarget)
-                        {
-                            list.Add(beatmap.FolderPath);
-                        }
-                        else if (beatmap.GameModes.Any(modesToDelete.Contains))
-                        {
-                            var filesToDelete = _beatmapService.GetFilePathsForPartialDeletion(beatmap, modesToDelete);
-                            list.AddRange(filesToDelete);
-                        }
-                    }
-                    return list;
-                });
-
-                _deletionTargets = targets;
-
-                long totalSizeInBytes = await _beatmapService.CalculateTargetsSizeAsync(_deletionTargets);
-                int folderCount = _deletionTargets.Count(Directory.Exists);
-                int fileCount = _deletionTargets.Count(File.Exists);
-
-                DeletionSummaryMessage = $"Alvos: {folderCount} pastas e {fileCount} arquivos, liberando {FormattingUtils.FormatBytes(totalSizeInBytes)}.";
+                _deletionTargets = result.DeletionTargets;
+                DeletionSummaryMessage = result.SummaryMessage;
+                RefreshCommands();
             }
             catch (Exception ex)
             {
-                DeletionSummaryMessage = $"Erro ao calcular: {ex.Message}";
+                DeletionSummaryMessage = $"Error while calculating: {ex.Message}";
             }
             finally
             {
@@ -320,32 +302,45 @@ namespace OsuSweep.ViewModels
             }
         }
 
-
+        #region Deletion confirmation and execution
         private async Task ExecuteConfirmDeletionAsync()
         {
             string message = IsPermanentDelete
-                ? "Os arquivos serão apagados PERMANENTEMENTE. Esta ação não pode ser desfeita. \n\nDeseja continuar ?"
-                : "Os arquivos selecionados serão movidos para a Lixeira. \n\nDeseja continuar ?";
+                ? "The files will be PERMANENTLY deleted. This action cannot be undone. \n\nDo you want to continue? "
+                : "The selected files will be moved to the Recycle Bin. \n\nDo you want to continue ?";
 
             var result = MessageBox.Show(message, "Confirmação de Limpeza", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
             {
                 IsScanning = true;
-                StatusMessage = "Limpando Arquivos...";
+                StatusMessage = "Cleaning Files...";
 
+                try
+                {
 
-                await _beatmapService.DeleteTargetsAsync(_deletionTargets, IsPermanentDelete);
+                    await _deletionService.DeleteTargetsAsync(_deletionTargets, IsPermanentDelete);
 
-                StatusMessage = "Limpeza concluida!";
-                _deletionTargets.Clear();
-                DeletionSummaryMessage = string.Empty;
-                FoundBeatmaps.Clear();
+                    StatusMessage = "Cleanup complete!";
+                    _deletionTargets.Clear();
+                    DeletionSummaryMessage = string.Empty;
+                    FoundBeatmaps.Clear();
 
-                IsScanning = false;
+                    RefreshCommands();
+                }
+                catch (Exception ex)
+                {
+                    StatusMessage = $"Error while deleting: {ex.Message}";
+                }
+                finally
+                {
+                    IsScanning = false;
+                }
             }
         }
+        #endregion
 
+        #region Processing each beatmap (API vs Manual)
         private async Task ProcessApiBeatmapAsync(BeatmapSet beatmap)
         {
             var metadata = await _beatmapService.GetBeatmapMetadataAsync(beatmap.BeatmapSetId!.Value);
@@ -364,12 +359,13 @@ namespace OsuSweep.ViewModels
             {
                 var modeIds = _beatmapService.GetModesFromBeatmapSetFolder(beatmap.FolderPath);
 
-                var modeNames = modeIds.Select(id => ConvertModeIdToName(id)).ToList();
+                var modeNames = modeIds.Select(id => FormattingUtils.ConvertModeIdToName(id)).ToList();
 
                 beatmap.GameModes = modeNames;
                 beatmap.IsMetadataLoaded = true;
             });
         }
+        #endregion
     }
 }
 

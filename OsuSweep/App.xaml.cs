@@ -16,8 +16,10 @@ namespace OsuSweep
             var folderDialogService = new FolderDialogService();
             var beatmapService = new BeatmapService();
             var localizationService = new LocalizationService();
+            var deletionService = new DeletionService(beatmapService);
+           
 
-            var mainViewModel = new MainViewModel(folderDialogService, beatmapService, localizationService);
+            var mainViewModel = new MainViewModel(folderDialogService, beatmapService, localizationService, deletionService);
 
             var mainWindow = new MainWindow();
 
