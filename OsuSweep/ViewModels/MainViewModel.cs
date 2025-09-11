@@ -205,9 +205,10 @@ namespace OsuSweep.ViewModels
 
         private async Task FetchAllBeatmapMetadataAsync()
         {
-            // Filter the list to get only the beatmaps that have a valid ID.
-            var beatmapsToFetch = FoundBeatmaps.Where(b => b.BeatmapSetId.HasValue).ToList();
-            if (!beatmapsToFetch.Any())
+
+            var allBeatmaps = FoundBeatmaps.ToList();
+
+            if (!allBeatmaps.Any())
             {
                 StatusMessage = "Análise concluída! Nenhum mapa com ID online foi encontrado.";
                 IsReadyForSelection = true;
@@ -216,9 +217,10 @@ namespace OsuSweep.ViewModels
 
             var tasks = new List<Task>();
 
-            foreach (var beatmap in beatmapsToFetch)
+            foreach (var beatmap in allBeatmaps)
             {
                 
+                bool hasApiId = beatmap.BeatmapSetId.HasValue;
                 if (beatmap.BeatmapSetId.HasValue)
                 {
                     tasks.Add(ProcessApiBeatmapAsync(beatmap));
@@ -229,7 +231,10 @@ namespace OsuSweep.ViewModels
                 }
             }
 
-            await Task.WhenAll(tasks);
+            if (tasks.Any())
+            {
+                await Task.WhenAll(tasks);
+            }
 
             StatusMessage = "Analise completa!";
             IsReadyForSelection = true;
@@ -354,7 +359,7 @@ namespace OsuSweep.ViewModels
         }
 
         private async Task ProcessManualBeatmapAsync(BeatmapSet beatmap)
-        {
+            {
             await Task.Run(() =>
             {
                 var modeIds = _beatmapService.GetModesFromBeatmapSetFolder(beatmap.FolderPath);

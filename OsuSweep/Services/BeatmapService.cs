@@ -268,21 +268,23 @@ namespace OsuSweep.Services
         {
             try
             {
-                var headerLines = File.ReadLines(osuFilePath).Take(30);
+                var headerLines = File.ReadLines(osuFilePath).Take(50);
 
                 foreach (var line in headerLines)
                 {
                     var trimmedLine = line.Trim();
 
-                    if (trimmedLine.StartsWith("Mode:"))
+                    if (trimmedLine.StartsWith("Mode:", StringComparison.OrdinalIgnoreCase))
                     {
                         var parts = trimmedLine.Split(':');
 
                         if (parts.Length > 1)
                         {
-                            string numberText = parts[1].Trim();
+                            string rawNumberText = parts[1];
 
-                            if (int.TryParse(numberText, out int extractedMode))
+                            string cleanNumberText = new string(rawNumberText.Where(char.IsDigit).ToArray());
+
+                            if (!string.IsNullOrEmpty(cleanNumberText) && int.TryParse(cleanNumberText, out int extractedMode))
                             {
                                 return extractedMode;
                             }
