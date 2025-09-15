@@ -15,7 +15,6 @@ namespace OsuSweep.Core.Models
 
         [JsonPropertyName("difficulties")]
         public List<BeatmapDifficulty> Difficulties { get; set; } = new List<BeatmapDifficulty>();
-        
         public int BeatmapSetId { get; set; }
     }
 }

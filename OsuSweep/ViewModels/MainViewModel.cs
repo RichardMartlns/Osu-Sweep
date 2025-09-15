@@ -261,6 +261,7 @@ namespace OsuSweep.ViewModels
         }
         #endregion
 
+        #region Deletion Preview
         /// <summary>
         /// Triggered when a game mode selection changes.
         /// Starts the task of calculating the target list and the space to be freed.
@@ -301,6 +302,7 @@ namespace OsuSweep.ViewModels
                 IsScanning = false;
             }
         }
+        #endregion
 
         #region Deletion confirmation and execution
         private async Task ExecuteConfirmDeletionAsync()
