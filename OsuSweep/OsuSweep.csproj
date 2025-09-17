@@ -52,5 +52,9 @@
     <Resource Include="Resources\Images\flag_es.png" />
     <Resource Include="Resources\Images\flag_us.png" />
   </ItemGroup>
-
+	
+	<ItemGroup>
+		<InternalsVisibleTo Include="OsuSweep.Tests.Unit" />
+	</ItemGroup>
+	
 </Project>

@@ -10,9 +10,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuSweep.Backend", "OsuSwee
 		{0332C94C-9868-4B41-9294-9DB7D47D7600} = {0332C94C-9868-4B41-9294-9DB7D47D7600}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuSweep.Tests", "OsuSweep.Tests\OsuSweep.Tests.csproj", "{17C33FF5-B895-4811-B2EE-E8BB0E7C9020}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuSweep.Tests.Unit", "OsuSweep.Tests\OsuSweep.Tests.Unit.csproj", "{17C33FF5-B895-4811-B2EE-E8BB0E7C9020}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuSweep.Core", "OsuSweep.Core\OsuSweep.Core.csproj", "{BB3C89BE-C296-49F6-BC26-9215E2244876}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuSweep.Tests.Integration", "OsuSweep.Tests.Integration\OsuSweep.Tests.Integration.csproj", "{E7E116C3-3A70-4111-9A5B-BAC4AECE2E26}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +38,10 @@ Global
 		{BB3C89BE-C296-49F6-BC26-9215E2244876}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB3C89BE-C296-49F6-BC26-9215E2244876}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB3C89BE-C296-49F6-BC26-9215E2244876}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7E116C3-3A70-4111-9A5B-BAC4AECE2E26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7E116C3-3A70-4111-9A5B-BAC4AECE2E26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7E116C3-3A70-4111-9A5B-BAC4AECE2E26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7E116C3-3A70-4111-9A5B-BAC4AECE2E26}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

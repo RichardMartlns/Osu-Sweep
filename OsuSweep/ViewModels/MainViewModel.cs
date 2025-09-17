@@ -22,7 +22,7 @@ namespace OsuSweep.ViewModels
         private readonly IDeletionService _deletionService;
 
         // Internal state
-        private List<string> _deletionTargets = new();
+        internal List<string> _deletionTargets = new();
         private string _selectedFolderPath = string.Empty;
         private string _deletionSummaryMessage = string.Empty;
         private string _statusMessage = "Ready to start!";
