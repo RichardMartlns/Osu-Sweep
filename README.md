@@ -99,7 +99,7 @@ Instructions for building and running the project from source.
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/OsuSweep.git
+   git clone https://github.com/SoulBreathe/OsuSweep.git
    cd OsuSweep
    ```
 

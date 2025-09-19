@@ -1,9 +1,15 @@
 # osu! Sweep 🧹🎶
 
 <p align="center">
-  <a href="README.md"><img src="assets/flag_br.png" alt="Português" width="30"/></a>
-  <a href="docs/README_en.md"><img src="assets/flag_us.png" alt="English" width="30"/></a>
-  <a href="docs/README_es.md"><img src="assets/flag_es.png" alt="Español" width="30"/></a>
+  <a href="../README.md">
+    <img src="../assets/flag_us.png" alt="English" width="30"/>
+    &nbsp;English
+  </a>
+  &nbsp;&nbsp;
+  <a href="./README.es.md">
+    <img src="../assets/flag_es.png" alt="Español" width="30"/>
+    &nbsp;Español
+  </a>
 </p>
 
 Uma **ferramenta de desktop segura, inteligente e amigável** para gerenciar e limpar grandes coleções de beatmaps do **osu!**, com base nos modos de jogo que você realmente usa.
@@ -93,7 +99,7 @@ Instruções para compilar e executar o projeto a partir do código-fonte.
 1. Clone o repositório:
 
    ```bash
-   git clone https://github.com/seu-usuario/OsuSweep.git
+   git clone https://github.com/SoulBreathe/OsuSweep.git
    cd OsuSweep
    ```
 

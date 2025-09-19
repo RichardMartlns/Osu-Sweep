@@ -99,7 +99,7 @@ Instrucciones para compilar y ejecutar el proyecto desde el código fuente.
 1. Clona el repositorio:
 
    ```bash
-   git clone https://github.com/tu-usuario/OsuSweep.git
+   git clone https://github.com/SoulBreathe/OsuSweep.git
    cd OsuSweep
    ```
 
