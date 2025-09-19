@@ -1,12 +1,10 @@
-﻿using OsuSweep.Core.Models;
+﻿using OsuSweep.Core.Contracts.Services;
+using OsuSweep.Core.Models;
 using OsuSweep.Core.Utils;
-using OsuSweep.Services;
-using OsuSweep.Services.Localization;
 using OsuSweep.ViewModels.Base;
 using OsuSweep.ViewModels.Commands;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.IO;
 using System.Windows;
 using System.Windows.Input;
 
@@ -47,6 +45,21 @@ namespace OsuSweep.ViewModels
             {
                 if (SetProperty(ref _selectedFolderPath, value))
                     RefreshCommands();
+                // OnPropertyChanged(nameof(SelectedFolderPathDisplay));
+            }
+        }
+        public string SelectedFolderPathDisplay
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(SelectedFolderPath))
+                {
+                    return OsuSweep.Resources.Strings.SelectFolderFallback;
+                }
+                else
+                {
+                    return string.Format(OsuSweep.Resources.Strings.CurrentFolderPathLabel, SelectedFolderPath);
+                }
             }
         }
 
@@ -228,7 +241,7 @@ namespace OsuSweep.ViewModels
 
             foreach (var beatmap in allBeatmaps)
             {
-                
+
                 if (beatmap.BeatmapSetId.HasValue)
                 {
                     tasks.Add(ProcessApiBeatmapAsync(beatmap));
@@ -281,7 +294,7 @@ namespace OsuSweep.ViewModels
                 RefreshCommands();
                 return;
             }
-            
+
             try
             {
                 IsScanning = true;
@@ -356,7 +369,7 @@ namespace OsuSweep.ViewModels
         }
 
         private async Task ProcessManualBeatmapAsync(BeatmapSet beatmap)
-            {
+        {
             await Task.Run(() =>
             {
                 var modeIds = _beatmapService.GetModesFromBeatmapSetFolder(beatmap.FolderPath);

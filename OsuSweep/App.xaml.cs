@@ -1,4 +1,5 @@
-﻿using OsuSweep.Services;
+﻿using OsuSweep.Core.Contracts.Services;
+using OsuSweep.Services;
 using OsuSweep.Services.Localization;
 using OsuSweep.ViewModels;
 using OsuSweep.Views;

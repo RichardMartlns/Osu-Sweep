@@ -61,6 +61,33 @@ namespace OsuSweep.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Selected Folder: {0} .
+        /// </summary>
+        public static string CurrentFolderPathLabel {
+            get {
+                return ResourceManager.GetString("CurrentFolderPathLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select Folder.
+        /// </summary>
+        public static string SelectFolderButton {
+            get {
+                return ResourceManager.GetString("SelectFolderButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selected Folder:  (None).
+        /// </summary>
+        public static string SelectFolderFallback {
+            get {
+                return ResourceManager.GetString("SelectFolderFallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please, select your Osu! &apos;Songs&apos; folder.
         /// </summary>
         public static string SelectFolderLabel {

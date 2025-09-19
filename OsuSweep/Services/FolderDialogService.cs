@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using OsuSweep.Core.Contracts.Services;
 
 namespace OsuSweep.Services
 {
@@ -8,7 +9,7 @@ namespace OsuSweep.Services
         {
             var dialog = new OpenFolderDialog
             {
-                Title = "Selecione a pasta 'Songs' do osu!"
+                Title = "Select the 'Osu!'songs folder"
             };
 
             if (dialog.ShowDialog() == true)

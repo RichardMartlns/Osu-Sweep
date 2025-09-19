@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using OsuSweep.Core.Contracts.Services;
+using System.Globalization;
 
 
 namespace OsuSweep.Services.Localization

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic.FileIO;
+using OsuSweep.Core.Contracts.Services;
 using OsuSweep.Core.Models;
 using OsuSweep.Core.Utils;
 using System.Diagnostics;
@@ -50,7 +51,7 @@ namespace OsuSweep.Services
             result.DeletionTargets = targets;
             result.TotalSizeInBytes = await _beatmapService.CalculateTargetsSizeAsync(targets);
             result.FolderCount = targets.Count(Directory.Exists);
-            result.SummaryMessage = $"Alvos: {result.FolderCount} pastas e {result.FileCount} arquivos, liberando {FormattingUtils.FormatBytes(result.TotalSizeInBytes)}.";
+            result.SummaryMessage = $"Targets: {result.FolderCount} folders and {result.FileCount} files, releasing {FormattingUtils.FormatBytes(result.TotalSizeInBytes)}.";
 
             return result;
         }
@@ -88,7 +89,7 @@ namespace OsuSweep.Services
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Falha ao deletar '{path}': {ex.Message}");
+                        Debug.WriteLine($"Failed to delete '{path}': {ex.Message}");
                     }
                 }
             });

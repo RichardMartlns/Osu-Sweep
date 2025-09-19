@@ -1,7 +1,7 @@
 ﻿using OsuSweep.Core.Models;
 using System.IO;
 
-namespace OsuSweep.Services
+namespace OsuSweep.Core.Contracts.Services
 {
     public interface IBeatmapService
     {

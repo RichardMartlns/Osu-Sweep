@@ -1,9 +1,7 @@
 ﻿using Moq;
+using OsuSweep.Core.Contracts.Services;
 using OsuSweep.Core.Models;
-using OsuSweep.Services;
-using OsuSweep.Services.Localization;
 using OsuSweep.ViewModels;
-using OsuSweep.ViewModels.Commands;
 
 namespace OsuSweep.Tests.ViewModels
 {
@@ -33,18 +31,18 @@ namespace OsuSweep.Tests.ViewModels
                 _mockBeatmapService.Object,
                 _mockILocalizationService.Object,
                 _mockDeletionService.Object);
-            
+
         }
 
         [TestMethod]
-        public void  ScanCommand_WhenExecuted_CallsBeatmapServiceAndUpdatesIsScanning()
+        public void ScanCommand_WhenExecuted_CallsBeatmapServiceAndUpdatesIsScanning()
         {
             // Arrange
             _viewModel.SelectedFolderPath = "C:\\fake\\path";
 
             // Act
             _viewModel.ScanCommand.Execute(null);
-            
+
             // Assert
             _mockBeatmapService.Verify(s => s.ScanSongsFolderAsync("C:\\fake\\path"), Times.Once());
         }

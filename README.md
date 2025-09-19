@@ -1,5 +1,5 @@
-[<img src="./assets/br.svg" width="35" title="View in Portuguese">](./README.pt.md)
-[<img src="./assets/es.svg" width="35" title="View in Spanish">](./README.es.md)
+[<img src="./assets/br.svg" width="35" title="View in Portuguese">](./docs/README.pt.md)
+[<img src="./assets/es.svg" width="35" title="View in Spanish">](./docs/README.es.md)
 
 # osu! Sweep
 

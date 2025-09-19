@@ -1,17 +1,45 @@
-# Arquivos específicos do Visual Studio e do sistema operacional
+# User-specific and IDE configuration files
+## Visual Studio
 .vs/
-*.user
 *.suo
+*.user
+*.userosscache
+*.sln.docstates
 
-# Pastas de compilação
+## VS Code
+.vscode/
+
+
+# Operating System Files
+## Mac
+.DS_Store
+.AppleDouble
+.LSOverride
+
+## Windows
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+
+
+# Build results and packages
 [Bb]in/
 [Oo]bj/
-
-# Arquivos de build e pacotes
-**/packages/*
-**/[Pp]ackages/*
+[Rr]elease/
+[Rr]eleases/
+packages/
 *.nupkg
-
-# Outros
-*~
+*.trx
 *.log
+
+
+# Local secrets and configuration files (VERY IMPORTANT)
+# Never commit API keys or secrets to the repository!
+local.settings.json
+secrets.json
+appsettings.Development.json
+
+
+# Miscellaneous
+*~
+*.swp
